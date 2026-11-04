@@ -1,8 +1,8 @@
 name: DC Monitor
 on:
   schedule:
-    - cron: '*/3 * * * *' # 改成了每 3 分钟检查一次
-  workflow_dispatch: 
+    - cron: '*/3 * * * *' # 每 3 分钟检查一次
+  workflow_dispatch: 
 
 jobs:
   check:
@@ -12,36 +12,38 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-          
+          
       - name: Run Script
         env:
-          QQ_EMAIL: ${{ secrets.QQ_EMAIL }}
-          QQ_PASS: ${{ secrets.QQ_PASS }}
-          INVITE_CODE: "puppyboo"
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          # ⚠️ 注意：现在这里填的是官方测试频道，为了让你立刻看到微信弹窗！测试成功后，记得把 discord-developers 改回 puppyboo
+          INVITE_CODE: "discord-developers" 
         run: |
           python -c "
-          import os, urllib.request, smtplib
-          from email.mime.text import MIMEText
-          
+          import os, urllib.request, json
+          
           code = os.environ['INVITE_CODE']
+          token = os.environ['PUSHPLUS_TOKEN']
           url = f'https://discord.com/api/v10/invites/{code}?with_counts=true'
-          
+          
           req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
           try:
               with urllib.request.urlopen(req, timeout=10) as response:
                   if response.status == 200:
-                      print('开门了！开始发邮件')
-                      content = f'🔥🔥🔥 卧槽！快醒醒！！！社区开门啦！！！ 🔥🔥🔥\n\n🎉 邀请码：{code}\n🔗 链接：https://discord.gg/{code}\n\n🏃‍♂️💨 别犹豫了！！！赶紧带上魔法冲进去！！！\n\n(这是云端机器人自动发的邮件，不要回复)'
-                      msg = MIMEText(content, 'plain', 'utf-8')
-                      msg['Subject'] = '🚨🚨🚨 紧急提醒！！！开门啦！！！快冲！！！ 🚨🚨🚨'
-                      msg['From'] = os.environ['QQ_EMAIL']
-                      msg['To'] = os.environ['QQ_EMAIL']
-                      
-                      server = smtplib.SMTP_SSL('smtp.qq.com', 465)
-                      server.login(os.environ['QQ_EMAIL'], os.environ['QQ_PASS'])
-                      server.sendmail(os.environ['QQ_EMAIL'], [os.environ['QQ_EMAIL']], msg.as_string())
-                      server.quit()
-                      print('邮件发送成功！')
+                      print('开门了！开始发微信')
+                      title = '🚨🚨🚨 卧槽！开门啦！快冲！！！'
+                      content = f'🔥🔥🔥 社区 {code} 开门了！\n\n🔗 链接：https://discord.gg/{code}\n\n🏃‍♂️💨 别犹豫了！！！赶紧带上魔法冲进去！！！'
+                      
+                      payload = {
+                          'token': token,
+                          'title': title,
+                          'content': content,
+                          'template': 'html'
+                      }
+                      data = json.dumps(payload).encode('utf-8')
+                      push_req = urllib.request.Request('https://www.pushplus.plus/send', data=data, headers={'Content-Type': 'application/json'})
+                      with urllib.request.urlopen(push_req, timeout=10) as push_resp:
+                          print('微信发送成功！')
                   else:
                       print('还没开门。')
           except Exception as e:
