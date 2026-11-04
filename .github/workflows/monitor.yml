@@ -16,8 +16,7 @@ jobs:
       - name: Run Script
         env:
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
-          # ⚠️ 注意：现在这里填的是官方测试频道，为了让你立刻看到微信弹窗！测试成功后，记得把 discord-developers 改回 puppyboo
-          INVITE_CODE: "discord-developers" 
+          INVITE_CODE: "8Kz6A28AU" # 已经换成你开着的社区啦
         run: |
           python -c "
           import os, urllib.request, json
