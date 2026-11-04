@@ -17,7 +17,7 @@ jobs:
         env:
           WXPUSHER_SPT: ${{ secrets.WXPUSHER_SPT }}
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          INVITE_CODE: "puppyboo"
+          INVITE_CODE: "8Kz6A28AU" # ⚠️ 这里换成了你那个开着的测试服务器！
         run: |
           python -c "
           import os, urllib.request, json
@@ -34,11 +34,13 @@ jobs:
                   if response.status == 200:
                       content = f'🔥🔥🔥 wbz！快醒醒！！！社区开门啦！！！ 🔥🔥🔥\n\n🎉 邀请码：{code}\n\n🔗 链接：https://discord.gg/{code}\n\n🏃‍♂️💨 别犹豫了！！！赶紧带上魔法冲进去！！！'
                       
+                      # 发 Discord
                       payload_dc = {'content': '@everyone ' + content}
                       data_dc = json.dumps(payload_dc).encode('utf-8')
                       req_dc = urllib.request.Request(webhook_url, data=data_dc, headers={'Content-Type': 'application/json'})
                       urllib.request.urlopen(req_dc, timeout=10)
                       
+                      # 发微信
                       payload_wx = {'spt': spt, 'content': content, 'summary': '🚨🚨🚨 紧急提醒：wbz！开门啦！快冲！！！ 🚨🚨🚨', 'contentType': 1}
                       data_wx = json.dumps(payload_wx).encode('utf-8')
                       req_wx = urllib.request.Request('https://wxpusher.zjiecode.com/api/send/message/simple-push', data=data_wx, headers={'Content-Type': 'application/json'})
