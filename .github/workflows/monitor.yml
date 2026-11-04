@@ -15,7 +15,7 @@ jobs:
       - name: Run Script
         env:
           WXPUSHER_SPT: ${{ secrets.WXPUSHER_SPT }}
-          INVITE_CODE: "8Kz6A28AU"
+          INVITE_CODE: "puppyboo"
         run: |
           python -c "
           import os, urllib.request, json
@@ -30,10 +30,13 @@ jobs:
                   if response.status == 200:
                       print('开门了！开始发微信...')
                       
+                      # 👇 这里已经改成了 wbz
+                      content = f'🔥🔥🔥 wbz！快醒醒！！！社区开门啦！！！ 🔥🔥🔥\n\n🎉 邀请码：{code}\n🔗 链接：https://discord.gg/{code}\n\n🏃‍♂️💨 别犹豫了！！！赶紧带上魔法冲进去！！！'
+                      
                       payload = {
                           'spt': spt,
-                          'content': f'🔥 社区 {code} 开门了！\n链接: https://discord.gg/{code}',
-                          'summary': '🚨 社区开门啦！',
+                          'content': content,
+                          'summary': '🚨🚨🚨 紧急提醒：wbz！开门啦！快冲！！！ 🚨🚨🚨',
                           'contentType': 1
                       }
                       data = json.dumps(payload).encode('utf-8')
